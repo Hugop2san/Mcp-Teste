@@ -7,15 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
-    
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
-  <ProjectReference Include="..\orquestraAPI.Pedidos.Application\orquestraAPI.Pedidos.Application.csproj" />
-  <ProjectReference Include="..\orquestraAPI.Pedidos.Infrastructure\orquestraAPI.Pedidos.Infrastructure.csproj" />
-  <ProjectReference Include="..\orquestraAPI.Pedidos.Domain\orquestraAPI.Pedidos.Domain.csproj" />
+    <ProjectReference Include="..\orquestraAPI.Pedidos.Application\orquestraAPI.Pedidos.Application.csproj" />
+    <ProjectReference Include="..\orquestraAPI.Pedidos.Infrastructure\orquestraAPI.Pedidos.Infrastructure.csproj" />
+    <ProjectReference Include="..\orquestraAPI.Pedidos.Domain\orquestraAPI.Pedidos.Domain.csproj" />
   </ItemGroup>
 
 

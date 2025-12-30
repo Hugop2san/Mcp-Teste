@@ -2,6 +2,7 @@
 using orquestraAPI.Pedidos.Domain.Entities;
 using orquestraAPI.Pedidos.Domain.Interfaces;
 using orquestraAPI.Pedidos.Infrastructure.ExternalModels;
+using System.Linq;
 
 
 
@@ -22,7 +23,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
         public async Task<IEnumerable<Produto>> GetAll()
         {
             var apiResponse = await _http.GetFromJsonAsync<List<ProdutoApiModel>>(
-                "https://693a8f799b80ba7262ca6b6c.mockapi.io/produto"
+                "produto"
                 );
 
             if (apiResponse is null) return Enumerable.Empty<Produto>();
@@ -43,7 +44,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
         public async Task<Produto?> GetById(int id)
         {
             var apiResponse = await _http.GetFromJsonAsync<ProdutoApiModel>(
-                $"https://693a8f799b80ba7262ca6b6c.mockapi.io/produto/{id}"
+                $"/produto/{id}"
                 );
 
             if (apiResponse == null) return null;
@@ -55,8 +56,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
                     Nome = apiResponse.nome,
                     Preco = decimal.Parse(apiResponse.preco),
                     Quantidade = int.Parse(apiResponse.quantidade)
-                }
-                ;
+                };
         }
 
 
