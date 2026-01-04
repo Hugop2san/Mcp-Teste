@@ -28,13 +28,23 @@ builder.Services.AddHttpClient<IProdutoRepository, ProdutoRepository>(client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-
+// DI do MCP
 builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<McpApplyMethods>();
-
-// DI de Tools do MCP
+// DI tools
 builder.Services.AddScoped<GetProdutosTool>();
 builder.Services.AddScoped<GetProdudosIdTool>();
+
+// Di do frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 
 var app = builder.Build();
@@ -54,6 +64,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//frontend
+app.UseCors("frontend");
 // Mapear os controllers automaticamente
 app.MapControllers();
 
