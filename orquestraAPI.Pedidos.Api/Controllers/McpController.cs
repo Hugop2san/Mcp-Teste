@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using orquestraAPI.Pedidos.Infrastructure.Mcp;
 
-namespace orquestraAPI.Pedidos.Api.Controllerss
+namespace orquestraAPI.Pedidos.Api.Controllers
 {
     [ApiController]
     [Route("mcp")]
