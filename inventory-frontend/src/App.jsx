@@ -39,9 +39,10 @@ export default function App() {
   async function loadProdutos() {
     setLoading(true);
     try {
-      const r = await callMcp("get_produtos", null);
+      const r = await callMcp("return_all", null);
       setProdutos(r.data ?? []);
     } catch (e) {
+      console.error("Erro ao carregar produtos:", e);
       setChat((c) => [...c, { role: "assistant", text: `Erro ao carregar produtos: ${String(e.message || e)}` }]);
     } finally {
       setLoading(false);
@@ -52,24 +53,26 @@ export default function App() {
     loadProdutos();
   }, []);
 
-  // Router de linguagem natural (simples e portfólio-friendly)
+  // Router de linguagem natural simples 
   function decideToolFromText(text) {
     const t = text.trim().toLowerCase();
 
     // "produto 5"
     const idMatch = t.match(/produto\s+(\d+)/);
-    if (idMatch) return { tool: "get_produto_by_id", args: { id: Number(idMatch[1]) } };
+    if (idMatch) return { tool: "return_by_id", args: { id: Number(idMatch[1]) } };
 
     // "listar"
     if (t.includes("listar") || t.includes("lista") || t === "produtos") {
-      return { tool: "get_produtos", args: null };
+      return { tool: "return_all", args: null };
     }
 
     // "estoque baixo 5"
     const lowMatch = t.match(/estoque\s+baixo\s*(\d+)?/);
     if (lowMatch) {
       const limite = lowMatch[1] ? Number(lowMatch[1]) : 5;
+
       // Se você ainda não tem tool de estoque baixo, o front calcula local
+      // ADICIONAR CALCULO DE ESTOQUE BAIXO NO BACKEND
       return { tool: "local_estoque_baixo", args: { limite } };
     }
 
@@ -79,6 +82,7 @@ export default function App() {
     return null;
   }
 
+  // REALIZAR MANUNTENÇÃO
   async function handleSend(e) {
     e.preventDefault();
     const text = prompt.trim();
@@ -102,6 +106,8 @@ export default function App() {
         ]);
         return;
       }
+
+      // INVERTER AS ORDENS DO IF -> DANDO PRIORIDADE PARA AS TOOLS CRIADAS
 
       // Tools locais (sem precisar criar tool no backend agora)
       if (decision.tool === "local_estoque_baixo") {
@@ -134,7 +140,7 @@ export default function App() {
       const result = await callMcp(decision.tool, decision.args);
 
       // Se buscar por id, mostra só o objeto
-      if (decision.tool === "get_produto_by_id") {
+      if (decision.tool === "return_by_id") {
         if (!result.ok) {
           setChat((c) => [...c, { role: "assistant", text: result.error ?? "Não encontrado." }]);
         } else {
@@ -148,7 +154,7 @@ export default function App() {
       }
 
       // Se listar, atualiza tabela também
-      if (decision.tool === "get_produtos") {
+      if (decision.tool === "return_all") {
         const data = result.data ?? [];
         setProdutos(data);
         setChat((c) => [...c, { role: "assistant", text: `OK. Carreguei ${data.length} produtos.` }]);
