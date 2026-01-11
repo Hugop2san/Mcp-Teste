@@ -82,7 +82,7 @@ export default function App() {
     return null;
   }
 
-  // REALIZAR MANUNTENÇÃO
+  // função que deve chamar meus protocolos mcp criados !
   async function handleSend(e) {
     e.preventDefault();
     const text = prompt.trim();
@@ -100,16 +100,38 @@ export default function App() {
           ...c,
           {
             role: "assistant",
-            text:
-              "Não entendi. Tente: 'listar', 'produto 5', 'estoque baixo 5' ou 'total'.",
+            text: "Não entendi. Tente: 'listar', 'produto 5', 'estoque baixo 5' ou 'total'.",
           },
         ]);
         return;
       }
 
-      // INVERTER AS ORDENS DO IF -> DANDO PRIORIDADE PARA AS TOOLS CRIADAS
-
       // Tools locais (sem precisar criar tool no backend agora)
+      // Tools MCP (backend)
+      const result = await callMcp(decision.tool, decision.args);
+
+      // Se listar, atualiza tabela também
+      if (decision.tool === "return_all") {
+        const data = result.data ?? [];
+        setProdutos(data);
+        setChat((c) => [...c, { role: "assistant", text: `OK. Carreguei ${data.length} produtos.` }]);
+        return;
+      }
+
+      // Se buscar por id, mostra só o objeto
+      if (decision.tool === "return_by_id") {
+        if (!result.ok) {
+          setChat((c) => [...c, { role: "assistant", text: result.error ?? "Não encontrado." }]);
+        } else {
+          setChat((c) => [
+            ...c,
+            { role: "assistant", text: "Resultado:" },
+            { role: "assistant", text: JSON.stringify(result.data, null, 2) },
+          ]);
+        }
+        return;
+      }
+
       if (decision.tool === "local_estoque_baixo") {
         const limite = decision.args?.limite ?? 5;
         const low = produtos.filter((p) => Number(p.quantidade ?? 0) < limite);
@@ -136,30 +158,7 @@ export default function App() {
         return;
       }
 
-      // Tools MCP (backend)
-      const result = await callMcp(decision.tool, decision.args);
 
-      // Se buscar por id, mostra só o objeto
-      if (decision.tool === "return_by_id") {
-        if (!result.ok) {
-          setChat((c) => [...c, { role: "assistant", text: result.error ?? "Não encontrado." }]);
-        } else {
-          setChat((c) => [
-            ...c,
-            { role: "assistant", text: "Resultado:" },
-            { role: "assistant", text: JSON.stringify(result.data, null, 2) },
-          ]);
-        }
-        return;
-      }
-
-      // Se listar, atualiza tabela também
-      if (decision.tool === "return_all") {
-        const data = result.data ?? [];
-        setProdutos(data);
-        setChat((c) => [...c, { role: "assistant", text: `OK. Carreguei ${data.length} produtos.` }]);
-        return;
-      }
 
       // fallback
       setChat((c) => [...c, { role: "assistant", text: JSON.stringify(result, null, 2) }]);

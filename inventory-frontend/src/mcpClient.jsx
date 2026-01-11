@@ -1,4 +1,5 @@
-const API_BASE = "http://localhost:5130"; // ou https://localhost:7262
+const API_BASE = "https://localhost:7262"; 
+// ou https://localhost:7262
 
 export async function callMcp(tool, args = null) {
   console.log("[MCP] calling:", API_BASE, tool, args);
