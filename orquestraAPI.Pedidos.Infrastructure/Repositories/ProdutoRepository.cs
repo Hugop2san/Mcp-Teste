@@ -60,6 +60,32 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
         }
 
 
+        //  CONSERTAR !
+        public Task<Produto> AddAsync(Produto produto)
+        {
+            var apiModel = new ProdutoApiModel
+            {
+                nome = produto.Nome,
+                preco = produto.Preco.ToString(),
+                quantidade = produto.Quantidade.ToString()
+            };
+
+
+            var response = await _http.PostAsJsonAsync("produto", apiModel);
+
+            response.EnsureSuccessStatusCode();
+
+            var created = await response.Content.ReadFromJsonAsync<ProdutoApiModel>();
+
+            return new Produto
+            {
+                Id = int.Parse(created.id),
+                Nome = created.nome,
+                Preco = decimal.Parse(created.preco),
+                Quantidade = int.Parse(created.quantidade)
+            };
+        }
+
 
 
         // AJUSTAR OS OUTROS METODOS PARA BUSCAR NA API TAMBEM !!!!!!!!
@@ -71,12 +97,6 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
             return Task.FromResult(_produtos.FirstOrDefault(p => p.Id == id));
         }
 
-        public Task Add(Produto produto)
-        {
-            produto.Id = _produtos.Max(p => p.Id) + 1;
-            _produtos.Add(produto);
-            return Task.CompletedTask;
-        }
 
         public Task Update(Produto produto)
         {
