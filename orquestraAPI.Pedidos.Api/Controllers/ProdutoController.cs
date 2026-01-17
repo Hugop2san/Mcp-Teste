@@ -33,7 +33,8 @@ namespace orquestraAPI.Pedidos.Api.Controllers
             return Ok(produto);
         }
 
-        /*
+
+        //  REALIZAR MANUNTENÇÃO NESSE METODO DE CRIAÇÃO DE PRODUTO
         [HttpPost]
         public async Task<IActionResult> Create(ProdutoDTO dto)
         {
@@ -41,6 +42,7 @@ namespace orquestraAPI.Pedidos.Api.Controllers
             return Ok();
         }
 
+        /*
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, ProdutoDTO dto)
         {

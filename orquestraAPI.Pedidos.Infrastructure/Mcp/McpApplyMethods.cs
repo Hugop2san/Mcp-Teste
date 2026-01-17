@@ -38,7 +38,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Mcp
             };
         }
 
-
+        // antes de chamar o metodo da tool eu realizo tratamentos dessa camada e depois delego pra tool
         public async Task<object> GetProdIdTool( McpRequest requestid ) 
         {
 

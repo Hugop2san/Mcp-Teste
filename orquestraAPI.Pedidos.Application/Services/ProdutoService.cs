@@ -24,20 +24,26 @@ namespace orquestraAPI.Pedidos.Application.Services
         {
             return await _repository.GetById(id);
         }
-
-        /*
-        public async Task Criar(ProdutoDTO dto)
+        
+        public async Task<Produto?> CriarProduto(ProdutoDTO dto)
         {
-            var produto = new Produto
+            // Tratamentos de erro
+            if (dto is null) throw new ArgumentNullException(nameof(dto));
+            if (string.IsNullOrWhiteSpace(dto.Nome)) throw new ArgumentException("Nome é obrigatório.", nameof(dto.Nome));
+            if (dto.Preco < 0) throw new ArgumentOutOfRangeException(nameof(dto.Preco), "Preço não pode ser negativo.");
+            if (dto.Quantidade < 0) throw new ArgumentOutOfRangeException(nameof(dto.Quantidade), "Quantidade não pode ser negativa.");
+
+            var result = new Produto
             {
                 Nome = dto.Nome,
                 Preco = dto.Preco,
                 Quantidade = dto.Quantidade
             };
-
-            await _repository.Add(produto);
+            
+            return await _repository.AddAsync(result);
         }
 
+        /*
         public async Task Atualizar(int id, ProdutoDTO dto)
         {
             var produto = await _repository.GetById(id);

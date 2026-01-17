@@ -34,6 +34,8 @@ builder.Services.AddScoped<McpApplyMethods>();
 // DI tools
 builder.Services.AddScoped<GetProdutosTool>();
 builder.Services.AddScoped<GetProdudosIdTool>();
+builder.Services.AddScoped<AddAsyncTool>();
+
 
 // Di do frontend
 builder.Services.AddCors(options =>
