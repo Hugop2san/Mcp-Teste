@@ -60,29 +60,50 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
         }
 
 
-        //  CONSERTAR !
-        public Task<Produto> AddAsync(Produto produto)
+        //  
+        public async Task<Produto> AddAsync(Produto produto)
         {
             var apiModel = new ProdutoApiModel
             {
                 nome = produto.Nome,
-                preco = produto.Preco.ToString(),
+                preco = produto.Preco.ToString(),  
                 quantidade = produto.Quantidade.ToString()
             };
 
+            using var response = await _http.PostAsJsonAsync("produto", apiModel);
 
-            var response = await _http.PostAsJsonAsync("produto", apiModel);
+            // Garante que obtenhamos um status 2xx; caso contrário lançará HttpRequestException
+            try
+            {
+                // Verifica se a resposta indica sucesso de 200 a 299
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException ex)
+            {
+                // Lê o corpo da resposta para incluir na mensagem de erro por conta do API retornar erros customizados
+                var body = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Erro na chamada POST /produto: {(int)response.StatusCode} {response.ReasonPhrase}. Body: {body}", ex);
+            }
 
-            response.EnsureSuccessStatusCode();
-
+            //le o o conteudo da resposta do tipo json e trato-o como ProdutoApiModel   
             var created = await response.Content.ReadFromJsonAsync<ProdutoApiModel>();
+            if (created is null)
+                throw new InvalidOperationException("Resposta da API veio vazia ao criar produto.");
+
+            //TryParse para evitar exceções de conversão.
+            if (!int.TryParse(created.id, out var id))
+                throw new FormatException($"Id retornado inválido: '{created.id}'");
+            if (!decimal.TryParse(created.preco, out var preco))
+                throw new FormatException($"Preço retornado inválido: '{created.preco}'");
+            if (!int.TryParse(created.quantidade, out var quantidade))
+                throw new FormatException($"Quantidade retornada inválida: '{created.quantidade}'");
 
             return new Produto
             {
-                Id = int.Parse(created.id),
+                Id = id,
                 Nome = created.nome,
-                Preco = decimal.Parse(created.preco),
-                Quantidade = int.Parse(created.quantidade)
+                Preco = preco,
+                Quantidade = quantidade
             };
         }
 
@@ -91,13 +112,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
         // AJUSTAR OS OUTROS METODOS PARA BUSCAR NA API TAMBEM !!!!!!!!
 
         /* 
-        public Task<Produto?> GetById(int id)
-        {
-
-            return Task.FromResult(_produtos.FirstOrDefault(p => p.Id == id));
-        }
-
-
+       
         public Task Update(Produto produto)
         {
             var existing = _produtos.First(p => p.Id == produto.Id);
