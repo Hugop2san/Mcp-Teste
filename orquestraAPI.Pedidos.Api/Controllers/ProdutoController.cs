@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-using orquestraAPI.Pedidos.Application.Services;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using orquestraAPI.Pedidos.Application.DTOs;
+using orquestraAPI.Pedidos.Application.Services;
 using orquestraAPI.Pedidos.Domain.Entities;
 
 
 namespace orquestraAPI.Pedidos.Api.Controllers
 {
     [ApiController]
-    [Route("api/produtos")]
+    //[Route("api/produtos")]
+    [Route("api/[controller]")]
     public class ProdutoController : ControllerBase
     {
         private readonly ProdutoService _service;
@@ -18,14 +19,14 @@ namespace orquestraAPI.Pedidos.Api.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet("buscar_todos")]
         public async Task<IActionResult> GetAll()
         {
             var produtos = await _service.BuscarTodos();
             return Ok(produtos);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{Id}")]
         public async Task<IActionResult> Get(int id)
         {
             var produto = await _service.BuscarPorId(id);
@@ -34,12 +35,20 @@ namespace orquestraAPI.Pedidos.Api.Controllers
         }
 
 
-        //  REALIZAR MANUNTENÇÃO NESSE METODO DE CRIAÇÃO DE PRODUTO
-        [HttpPost]
-        public async Task<IActionResult> Create(ProdutoDTO dto)
+        //  CRIAÇÃO DE PRODUTO
+        [HttpPost("criar_produto")]
+        public async Task<IActionResult> Create([FromBody] ProdutoDTO dto)
         {
-            await _service.Criar(dto);
-            return Ok();
+            if(dto == null) 
+                return BadRequest("Dados do produto são obrigatórios.");
+
+            var created = await _service.CriarProduto(dto);
+
+            if (created == null) 
+                return BadRequest("Produto nao foi criado");
+
+              // Retorna 201 Created com Location apontando para Get(id)
+            return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
         }
 
         /*
