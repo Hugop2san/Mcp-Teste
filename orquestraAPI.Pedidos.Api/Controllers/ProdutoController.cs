@@ -65,6 +65,13 @@ namespace orquestraAPI.Pedidos.Api.Controllers
             await _service.Remover(id);
             return Ok();
         }
+
+
+                ** análises **
+        Task<int> TotalProdutos();
+        Task<Produto?> ProdutoMaisCaro(); // permite retorno nulo caso não haja produtos
+
+
         */
     }
 }
