@@ -5,7 +5,7 @@ using orquestraAPI.Pedidos.Infrastructure.Mcp;
 using orquestraAPI.Pedidos.Infrastructure.Mcp.Tools;
 using orquestraAPI.Pedidos.Infrastructure.Repositories;
 
-// INSTALAR PACOTE DA OPEN AI
+// PACOTE DA OPEN AI
 using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,10 +39,13 @@ builder.Services.AddScoped<GetProdutosTool>();
 builder.Services.AddScoped<GetProdudosIdTool>();
 builder.Services.AddScoped<AddProdutosTool>();
 
-// DI OpenAI (recomendado)
-builder.Services.AddSingleton(new OpenAI.OpenAIClient(
-    builder.Configuration["OpenAI:ApiKey"]
-));
+// DI OpenAI com tratamento
+var apiKey = builder.Configuration["OpenAI:ApiKey"];
+if (string.IsNullOrWhiteSpace(apiKey))
+    throw new InvalidOperationException("OpenAI:ApiKey não configurada.");
+
+// DI do SDK oficial da OpenAI
+builder.Services.AddSingleton(_ => new OpenAIClient(apiKey));
 
 // DI do “Modo IA”
 builder.Services.AddScoped<AiOrchestrator>();
