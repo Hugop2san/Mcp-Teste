@@ -118,6 +118,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Mcp
                 }
             }
 
+            // 
             var dto = new ProdutoDTO
             {
                 Nome = nomeProp.GetString()!.Trim(),

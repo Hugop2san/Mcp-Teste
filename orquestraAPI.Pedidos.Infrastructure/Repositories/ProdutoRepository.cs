@@ -22,6 +22,7 @@ namespace orquestraAPI.Pedidos.Infrastructure.Repositories
         //METODOS INTERFACES COM DADOS DA API 
         public async Task<IEnumerable<Produto>> GetAll()
         {
+            // instancia do banco de dados
             var apiResponse = await _http.GetFromJsonAsync<List<ProdutoApiModel>>(
                 "produto"
                 );
